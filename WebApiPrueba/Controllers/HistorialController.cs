@@ -16,10 +16,10 @@ namespace WebApiPrueba.Controllers
             _historialData = historialData;
         }
 
-        [HttpGet ("{idUsuario}/{tipoMovimiento}")]
-        public async Task<IActionResult> ListaProductoActivos(int idUsuario, string tipoMovimiento)
+        [HttpGet ("{tipoMovimiento}")]
+        public async Task<IActionResult> ListaProductoActivos( string tipoMovimiento)
         {
-            List<Historial> lista = await _historialData.ListadoHistorial( idUsuario, tipoMovimiento);
+            List<Historial> lista = await _historialData.ListadoHistorial(tipoMovimiento);
             return StatusCode(StatusCodes.Status200OK, lista);
         }
 

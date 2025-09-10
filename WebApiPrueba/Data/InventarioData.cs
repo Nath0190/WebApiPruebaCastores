@@ -61,6 +61,7 @@ namespace WebApiPrueba.Data
                             idProducto = Convert.ToInt32(reader["idProducto"]),
                             estatus = Convert.ToInt32(reader["estatus"]),
                             nombre = reader["nombre"].ToString(),
+                            nombreEstatus = reader["nombreEstatus"].ToString(),
                             cantidad = Convert.ToInt32(reader["cantidad"]),
                             precio = Convert.ToDecimal(reader["precio"])
                         });
@@ -96,40 +97,48 @@ namespace WebApiPrueba.Data
             return Resp;
         }
 
-        public async Task<bool> ActualizarProducto(Producto obj)
+        public async Task<Producto> Obtener(int Id)
         {
-            bool Resp = true;
-            using (var conn = new SqlConnection(connection))
+            Producto objeto = new Producto();
+
+            using (var con = new SqlConnection(connection))
             {
-                SqlCommand comm = new SqlCommand("sp_ConsultaStock", conn);
-                comm.Parameters.AddWithValue("@p_idProducto", obj.idProducto);
-                comm.Parameters.AddWithValue("@p_cantidad", obj.cantidad);
+                await con.OpenAsync();
+                SqlCommand cmd = new SqlCommand("sp_obtenerProducto", con);
+                cmd.Parameters.AddWithValue("@p_idProducto", Id);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                comm.CommandType = CommandType.StoredProcedure;
-
-                try
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    await conn.OpenAsync();
-                    Resp = await comm.ExecuteNonQueryAsync() > 0 ? true : false;
-                }
-                catch
-                {
-                    Resp = false;
+                    while (await reader.ReadAsync())
+                    {
+                        objeto = new Producto
+                        {
+                            idProducto = Convert.ToInt32(reader["idProducto"]),
+                            nombre = reader["nombre"].ToString(),
+                            nombreEstatus = reader["nombreEstatus"].ToString(),
+                            estatus = Convert.ToInt32(reader["estatus"].ToString()),
+                            cantidad = Convert.ToInt32(reader["cantidad"].ToString()),
+                            precio = Convert.ToDecimal(reader["precio"]),
+                        };
+                    }
                 }
             }
-            return Resp;
+            return objeto;
         }
 
-        public async Task<bool> ActualizarEstatus(int idProducto, int estatus, int idUsuario, string movimiento)
+       
+
+        public async Task<bool> ActualizarEstatus(ActualizarResp obj, int id )
         {
             bool Resp = true;
             using (var conn = new SqlConnection(connection))
             {
                 SqlCommand comm = new SqlCommand("sp_CambiarEstatusProducto", conn);
-                comm.Parameters.AddWithValue("@p_idProducto", idProducto);
-                comm.Parameters.AddWithValue("@p_estatus", estatus);
-                comm.Parameters.AddWithValue("@p_idUsuario", idUsuario);
-                comm.Parameters.AddWithValue("@p_movimiento", movimiento);
+                comm.Parameters.AddWithValue("@p_idProducto", id);
+                comm.Parameters.AddWithValue("@p_estatus", obj.estatus);
+                comm.Parameters.AddWithValue("@p_idUsuario", obj.idUsuario);
+                comm.Parameters.AddWithValue("@p_movimiento", obj.tipoMovimiento);
 
                 comm.CommandType = CommandType.StoredProcedure;
 
@@ -145,5 +154,7 @@ namespace WebApiPrueba.Data
             }
             return Resp;
         }
+
+
     }
 }

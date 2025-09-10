@@ -38,17 +38,19 @@ namespace WebApiPrueba.Controllers
             return StatusCode(StatusCodes.Status200OK, new { isSuccess = resp });
         }
 
-        [HttpPut]
-        public async Task<IActionResult> ActualizarProducto([FromBody] Producto obj)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Obtener(int id)
         {
-            bool resp = await _inventarioData.ActualizarProducto(obj);
-            return StatusCode(StatusCodes.Status200OK, new { isSuccess = resp });
+             Producto objeto = await _inventarioData.Obtener(id);
+            return StatusCode(StatusCodes.Status200OK, objeto);
         }
 
-        [HttpPut("{idProducto}/{estatus}/{idUsuario}/{movimiento}")]
-        public async Task<IActionResult> ActualizarEstatus(int idProducto, int estatus, int idUsuario, string movimiento)
+        
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarEstatus([FromBody] ActualizarResp obj,int id)
         {
-            bool resp = await _inventarioData.ActualizarEstatus(idProducto, estatus, idUsuario, movimiento);
+            bool resp = await _inventarioData.ActualizarEstatus(obj, id);
             return StatusCode(StatusCodes.Status200OK, new { isSuccess = resp });
         }
     }

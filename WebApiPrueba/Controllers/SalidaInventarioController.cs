@@ -24,10 +24,17 @@ namespace WebApiPrueba.Controllers
             return StatusCode(StatusCodes.Status200OK, lista);
         }
 
-        [HttpPut("{idProducto}/{cantidad}")]
-        public async Task<IActionResult> ActualizarEstatus(int idProducto, int cantidad)
+        [HttpPut]
+        public async Task<IActionResult> ActualizarStock([FromBody] Producto obj)
         {
-            bool resp = await _salidaInventarioData.ActualizarStock(idProducto, cantidad);
+            bool resp = await _salidaInventarioData.ActualizarStock(obj);
+            return StatusCode(StatusCodes.Status200OK, new { isSuccess = resp });
+        }
+
+        [HttpPut("{movimiento}")]
+        public async Task<IActionResult> ActualizarSalida([FromBody] Producto obj,string movimiento)
+        {
+            bool resp = await _salidaInventarioData.ActualizarSalida(obj,movimiento);
             return StatusCode(StatusCodes.Status200OK, new { isSuccess = resp });
         }
     }

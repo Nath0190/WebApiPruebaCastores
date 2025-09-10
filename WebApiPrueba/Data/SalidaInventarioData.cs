@@ -41,14 +41,41 @@ namespace WebApiPrueba.Data
             return listaProducto;
         }
 
-        public async Task<bool> ActualizarStock(int idProducto, int cantidad)
+        public async Task<bool> ActualizarStock(Producto obj)
         {
             bool Resp = true;
             using (var conn = new SqlConnection(connection))
             {
                 SqlCommand comm = new SqlCommand("sp_ActualizarStock", conn);
-                comm.Parameters.AddWithValue("@p_idProducto", idProducto);
-                comm.Parameters.AddWithValue("@p_cantidad", cantidad);
+                comm.Parameters.AddWithValue("@p_idProducto", obj.idProducto);
+                comm.Parameters.AddWithValue("@p_cantidad", obj.cantidad);
+
+                comm.CommandType = CommandType.StoredProcedure;
+
+                try
+                {
+                    await conn.OpenAsync();
+                    Resp = await comm.ExecuteNonQueryAsync() > 0 ? true : false;
+                }
+                catch
+                {
+                    Resp = false;
+                }
+            }
+            return Resp;
+
+        }
+
+        public async Task<bool> ActualizarSalida(Producto obj, string movimiento)
+        {
+            bool Resp = true;
+            using (var conn = new SqlConnection(connection))
+            {
+                SqlCommand comm = new SqlCommand("sp_ConsultaStock", conn);
+                comm.Parameters.AddWithValue("@p_idProducto", obj.idProducto);
+                comm.Parameters.AddWithValue("@p_cantidad", obj.cantidad);
+                comm.Parameters.AddWithValue("@p_idUsuario", obj.idUsuarioModificacion);
+                comm.Parameters.AddWithValue("@p_movimiento", movimiento);
 
                 comm.CommandType = CommandType.StoredProcedure;
 

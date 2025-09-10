@@ -13,7 +13,7 @@ namespace WebApiPrueba.Data
             connection = configuration.GetConnectionString("connectionLocal")!;
         }
 
-        public async Task<List<Historial>> ListadoHistorial(int idUsuario, string tipoMovimiento)
+        public async Task<List<Historial>> ListadoHistorial(string tipoMovimiento)
         {
             List<Historial> listadoHistorial = new List<Historial>();
 
@@ -21,7 +21,6 @@ namespace WebApiPrueba.Data
             {
                 await con.OpenAsync();
                 SqlCommand cmd = new SqlCommand("sp_ListadoHistorial", con);
-                cmd.Parameters.AddWithValue("@p_idUsuario", idUsuario);
                 cmd.Parameters.AddWithValue("@p_movimiento", tipoMovimiento);
                 
                 cmd.CommandType = CommandType.StoredProcedure;
